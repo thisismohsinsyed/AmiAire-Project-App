@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Roboto', sans-serif;
+    }
+    #map {
+        height: 600px;
+        width: 100%;
+    }
+    .card {
+        margin-top: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    /* InfoWindow styling */
+    .infowindow-container {
+        min-width: 280px;
+        max-width: 450px;
+        border-radius: 6px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        background-color: #ffffff;
+        padding: 12px;
+    }
+    .infowindow-header {
+        margin-bottom: 10px;
+    }
+    .infowindow-subtitle {
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+    .table-scrollable {
+        max-height: 180px; /* limit the table height */
+        overflow-y: auto;  /* enable vertical scroll if too many rows */
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Mapa de contribuciones AmiAire</h1>
+
+    {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-body">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if marker_data %}
+<script>
+    function initMap() {
+        var mapCenter = {
+            lat: parseFloat('{{ map_center_latitude }}'),
+            lng: parseFloat('{{ map_center_longitude }}')
+        };
+        
+        // Use 'cooperative' so the user must hold CTRL to zoom with wheel.
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 5,
+            center: mapCenter,
+            gestureHandling: 'cooperative' 
+        });
+
+        var markers = {{ marker_data|safe }};
+
+        markers.forEach(function(markerItem) {
+            var position = {
+                lat: parseFloat(markerItem.latitude),
+                lng: parseFloat(markerItem.longitude)
+            };
+
+            var googleMarker = new google.maps.Marker({
+                position: position,
+                map: map,
+                icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+            });
+
+            // Build table rows for each sample
+            var tableRows = '';
+            markerItem.all_samples.forEach(function(sample){
+                var startDate = sample.experiment_start_date || 'N/A';
+                var endDate = sample.experiment_end_date || 'N/A';
+                var stdConc = sample.standard_concentration || 'N/A';
+                var polLevel = sample.pollution_level || 'N/A';
+
+                // If numeric, fix to 2 decimals and add unit
+                if (stdConc !== 'N/A' && !isNaN(stdConc)) {
+                    stdConc = parseFloat(stdConc).toFixed(2) + ' µg/m³';
+                }
+
+                tableRows += `
+                    <tr>
+                        <td>${startDate}</td>
+                        <td>${endDate}</td>
+                        <td>${stdConc}</td>
+                        <td>${polLevel}</td>
+                    </tr>
+                `;
+            });
+
+            var count = markerItem.count;
+            var last = markerItem.last_sample;
+
+            var lastStart = (last && last.experiment_start_date) ? last.experiment_start_date : 'N/A';
+            var lastEnd = (last && last.experiment_end_date) ? last.experiment_end_date : 'N/A';
+            var lastConc = (last && !isNaN(last.standard_concentration))
+                ? parseFloat(last.standard_concentration).toFixed(2) + ' µg/m³'
+                : 'N/A';
+            var lastPol = (last && last.pollution_level) ? last.pollution_level : 'N/A';
+
+            var infoWindowContent = `
+                <div class="infowindow-container">
+                    <div class="infowindow-header">
+                        <h6 class="mb-1"><strong>Total de Muestras:</strong> ${count}</h6>
+                    </div>
+                    ${
+                        last
+                        ? `
+                          <div class="infowindow-subtitle">
+                            <strong>Última muestra:</strong><br>
+                            Inicio: ${lastStart}<br>
+                            Fin: ${lastEnd}<br>
+                            Concentración: ${lastConc}<br>
+                            Nivel de contaminación: ${lastPol}
+                          </div>
+                          `
+                        : ``
+                    }
+                    <div class="table-responsive table-scrollable">
+                      <table class="table table-sm table-striped">
+                          <thead class="thead-light">
+                              <tr>
+                                  <th>Fecha Inicio</th>
+                                  <th>Fecha Fin</th>
+                                  <th>Concentración</th>
+                                  <th>Nivel</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              ${tableRows}
+                          </tbody>
+                      </table>
+                    </div>
+                </div>
+            `;
+
+            var infoWindow = new google.maps.InfoWindow({
+                content: infoWindowContent
+            });
+
+            // Open and close on mouseover/mouseout
+            googleMarker.addListener('mouseover', function() {
+                infoWindow.open(map, googleMarker);
+            });
+            googleMarker.addListener('mouseout', function() {
+                infoWindow.close();
+            });
+        });
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
+{% else %}
+<p class="text-center">No hay datos para mostrar en el mapa.</p>
+{% endif %}
+{% endblock %}

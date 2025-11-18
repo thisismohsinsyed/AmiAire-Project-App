@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Roboto', sans-serif;
+    }
+    .card-header {
+        font-weight: 600;
+    }
+    .img-fluid {
+        max-height: 300px;
+        object-fit: cover;
+    }
+    .grid-2x2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Herramienta Digital De Monitorización Y Análisis De La Calidad Del Aire</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            {% if error_message %}
+            <div class="alert alert-danger">{{ error_message }}</div>
+            {% endif %}
+            {% if success_message %}
+            <div class="alert alert-success">{{ success_message }}</div>
+            {% endif %}
+
+            <!-- Step 1: Experiment Dates -->
+            {% if step == 1 %}
+            <div class="card">
+                <div class="card-header">¿Cuando se hizo el experimento?</div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Fecha de colocación del sensor</label>
+                            <input type="date" name="start_date" id="start_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">Fecha de retirada del sensor</label>
+                            <input type="date" name="end_date" id="end_date" class="form-control" required>
+                        </div>
+                        <button type="submit" name="submit_dates" class="btn btn-primary btn-block">
+                            Siguiente
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Step 2: Get/Confirm Location w/ Draggable Marker -->
+            {% if step == 2 %}
+            <div class="card">
+                <div class="card-header">¿Donde se hizo el experimento?</div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="location_name" class="form-label">Ubicación del sensor de papel</label>
+                            <input type="text" name="location_name" id="location_name" class="form-control" required>
+                        </div>
+                        <button type="submit" name="location_step" class="btn btn-primary btn-block">
+                            Buscar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if latitude and longitude %}
+            <div class="card mt-4">
+                <div class="card-header">Mueve el cursor para seleccionar la ubicación exacta del sensor</div>
+                <div class="card-body">
+                    <div id="map" style="height: 500px; width: 100%;"></div>
+                    <form method="post" id="confirmLocationForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="final_lat" id="final_lat" value="{{ latitude }}"/>
+                        <input type="hidden" name="final_lng" id="final_lng" value="{{ longitude }}"/>
+                        <button type="submit" name="confirm_location" class="btn btn-success mt-3">
+                            Confirmar Ubicación
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initDraggableMap"
+                    async defer></script>
+            <script>
+                let marker;
+                function initDraggableMap() {
+                    const lat = parseFloat('{{ latitude }}');
+                    const lng = parseFloat('{{ longitude }}');
+                    const center = { lat: lat, lng: lng };
+
+                    const map = new google.maps.Map(document.getElementById("map"), {
+                        zoom: 15,
+                        center: center
+                    });
+
+                    marker = new google.maps.Marker({
+                        position: center,
+                        map: map,
+                        draggable: true,
+                        title: "Arrastra para afinar tu ubicación"
+                    });
+
+                    document.getElementById("confirmLocationForm").addEventListener("submit", function() {
+                        const pos = marker.getPosition();
+                        document.getElementById("final_lat").value = pos.lat();
+                        document.getElementById("final_lng").value = pos.lng();
+                    });
+                }
+            </script>
+            {% endif %}
+            {% endif %}
+
+            <!-- Step 3: Upload & Classify -->
+            {% if step == 3 %}
+            <div class="card">
+                <div class="card-header">Tu ubicación</div>
+                <div class="card-body">
+                    <div id="map" style="height: 500px; width: 100%;"></div>
+                </div>
+            </div>
+            <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initializeMap"
+                    async defer></script>
+            <script>
+                function initializeMap() {
+                    const latitude = parseFloat('{{ latitude|default:"0" }}');
+                    const longitude = parseFloat('{{ longitude|default:"0" }}');
+                    const location = { lat: latitude, lng: longitude };
+                    const map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 15,
+                        center: location
+                    });
+                    new google.maps.Marker({
+                        position: location,
+                        map: map,
+                        title: 'Selected Location',
+                        icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                    });
+                }
+            </script>
+
+            <div class="card mt-4">
+                <div class="card-header">Carga la imagen del sensor</div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Sube una imagen (máx. 10MB) del sensor de papel</label>
+                            <input type="file" name="image" id="image" class="form-control" accept="image/*" required>
+                        </div>
+                        <button type="submit" name="analyze_image" class="btn btn-primary btn-block">
+                            Analizar imagen
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Step 4: Confirm ROI -->
+            {% if step == 4 %}
+            <div class="card mt-4">
+                <div class="card-header">Detección del área de interés</div>
+                <div class="card-body">
+                    <p>Revisa que el área de interés del sensor (donde están las partículas) esté correctamente seleccionado en verde</p>
+                    {% if contour_image_b64 %}
+                    <img src="data:image/png;base64,{{ contour_image_b64 }}"
+                         alt="Imagen con contorno" class="img-fluid mb-3">
+                    {% endif %}
+                    <p>¿Se ha extraído correctamente el área de interés del sensor de papel?</p>
+                    {% if roi_image_b64 %}
+                    <img src="data:image/png;base64,{{ roi_image_b64 }}"
+                         alt="ROI" class="img-fluid mb-3">
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="confirm_roi" class="btn btn-success">
+                            Sí
+                        </button>
+                        <button type="submit" name="reject_roi" class="btn btn-danger">
+                            No, reintentar
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Step 5: Final Results -->
+            {% if step == 5 %}
+            <div class="card mt-4">
+                <div class="card-header">Resultados análisis de la imagen</div>
+                <div class="card-body">
+                    <div class="grid-2x2">
+                        <!-- 1. Imagen con contorno -->
+                        {% if contour_image_b64 %}
+                        <div>
+                            <h5>Detección de la región de interés</h5>
+                            <img src="data:image/png;base64,{{ contour_image_b64 }}"
+                                 alt="Imagen con contorno" class="img-fluid mb-3">
+                        </div>
+                        {% endif %}
+
+                        <!-- 2. ROI -->
+                        {% if roi_image_b64 %}
+                        <div>
+                            <h5>Región de interés (ROI)</h5>
+                            <img src="data:image/png;base64,{{ roi_image_b64 }}"
+                                 alt="ROI" class="img-fluid mb-3">
+                        </div>
+                        {% endif %}
+
+                        <!-- 3. Imagen binaria -->
+                        {% if binary_b64 %}
+                        <div>
+                            <h5>Imagen binaria</h5>
+                            <img src="data:image/png;base64,{{ binary_b64 }}"
+                                 alt="Binary Mask" class="img-fluid mb-3">
+                        </div>
+                        {% endif %}
+
+                        <!-- 4. Partículas resaltadas -->
+                        {% if overlay_b64 %}
+                        <div>
+                            <h5>Partículas detectadas</h5>
+                            <img src="data:image/png;base64,{{ overlay_b64 }}"
+                                 alt="Overlay Image" class="img-fluid mb-3">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if analysis_results %}
+            <div class="card mt-4">
+                <div class="card-header">Análisis del nivel de polución</div>
+                <div class="card-body">
+                    <p><strong>Concentración de partículas PM10: </strong> 
+                       {{ standard_concentration|floatformat:2 }}
+                       <strong>μg/m³</strong>
+                    </p>
+                    <p><strong>Nivel de polución:</strong> 
+                       {{ pollution_level }}</p>
+                </div>
+            </div>
+            {% endif %}
+            <div>
+                {{ pollution_levels_table|safe }}
+            </div>
+            <div class="text-center mt-4">
+                <p>¡Gracias por contribuir a la monitorización de la calidad del aire!</p>
+                <a href="{% url 'map_contributions' %}" class="btn btn-info">
+                    Ver el mapa de AmiAire
+                </a>
+            </div>
+            <img src="{% static 'Pollution_Level_Classification_Final.png' %}" alt="Pollution Level Classification"
+                 style="max-width: 70%; height: auto; margin-top: 20px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
+            {% endif %} <!-- Closing the step == 5 condition -->
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block custom_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Basic date validation for Step 1
+    var startDateInput = document.getElementById('start_date');
+    var endDateInput = document.getElementById('end_date');
+    var today = new Date().toISOString().split('T')[0];
+
+    if (startDateInput && endDateInput) {
+        startDateInput.setAttribute('max', today);
+        endDateInput.setAttribute('max', today);
+
+        startDateInput.addEventListener('change', validateDates);
+        endDateInput.addEventListener('change', validateDates);
+    }
+
+    function validateDates() {
+        var startDate = startDateInput.value;
+        var endDate = endDateInput.value;
+        if (startDate && endDate && startDate > endDate) {
+            alert('La fecha de inicio debe ser anterior a la fecha de finalización.');
+            startDateInput.value = '';
+            endDateInput.value = '';
+        }
+    }
+});
+</script>
+{% endblock %}

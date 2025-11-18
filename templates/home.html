@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+<style>
+    .hero-section {
+        background-color: #f8f9fa;
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .info-card {
+        transition: transform 0.3s ease;
+        height: 100%;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card {
+        background: #fff;
+        border-left: 4px solid #007bff;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .nav-button {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        margin: 0.5rem;
+    }
+    
+    footer {
+        margin-top: 40px;
+        background-color: #343a40;
+        color: #ffffff;
+        padding: 20px 0;
+    }
+    footer a {
+        color: #ffffff;
+        text-decoration: none;
+    }
+    footer a:hover {
+        color: #007bff;
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 mb-4">Air Pollution Analysis</h1>
+                <p class="lead mb-4">Analyze and track air pollution in your environment using image processing</p>
+                <div class="d-flex justify-content-center">
+                    <a href="{% url 'particle_analysis' %}" class="btn btn-primary nav-button">Start Analysis</a>
+                    <a href="{% url 'map_contributions' %}" class="btn btn-outline-primary nav-button">View Map</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Introduction Section -->
+    <div class="row mb-5">
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">What is Air Pollution?</h2>
+                    <p class="card-text">
+                        Air pollution is contamination of the indoor or outdoor environment by any chemical, physical or 
+                        biological agent that modifies the natural characteristics of the atmosphere.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sources Section -->
+    <div class="row mb-5">
+        <h2 class="text-center mb-4">Common Sources of Air Pollution</h2>
+        <div class="col-md-3">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title">Household Combustion</h5>
+                    <p class="card-text">Indoor burning of fuels for heating and cooking</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title">Motor Vehicles</h5>
+                    <p class="card-text">Emissions from cars, trucks, and other vehicles</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title">Industrial Facilities</h5>
+                    <p class="card-text">Manufacturing and industrial processes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title">Forest Fires</h5>
+                    <p class="card-text">Natural and human-caused forest fires</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Major Pollutants Section -->
+    <div class="row mb-5">
+        <h2 class="text-center mb-4">Major Public Health Concerns</h2>
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <h5>Particulate Matter</h5>
+                        <p>Fine particles that can penetrate deep into lungs</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <h5>Carbon Monoxide</h5>
+                        <p>Colorless, odorless gas from incomplete combustion</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <h5>Ozone</h5>
+                        <p>Ground-level ozone forming from industrial emissions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <h5>Nitrogen Dioxide</h5>
+                        <p>Toxic gas from vehicle exhaust and power plants</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <h5>Sulfur Dioxide</h5>
+                        <p>Industrial gas with severe respiratory effects</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHO Statistics -->
+    <div class="row mb-5">
+        <div class="col-lg-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h3 class="card-title">WHO Global Statistics</h3>
+                    <p class="card-text">
+                        WHO data show that almost all of the global population (99%) breathe air that exceeds WHO guideline 
+                        limits and contains high levels of pollutants, with low- and middle-income countries suffering from 
+                        the highest exposures.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="row mb-5">
+        <div class="col-lg-12 text-center">
+            <h3 class="mb-4">Start Analyzing Air Quality in Your Area</h3>
+            <div class="d-flex justify-content-center">
+                <a href="{% url 'particle_analysis' %}" class="btn btn-lg btn-primary me-3">Use Particle Analysis Tool</a>
+                <a href="{% url 'map_contributions' %}" class="btn btn-lg btn-outline-primary">View Global Contributions</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Footer -->
+<footer class="text-center">
+    <div class="container">
+        <p>&copy; 2024 Particle Analysis App. All Rights Reserved.</p>
+        <ul class="list-inline">
+            <li class="list-inline-item"><a href="/">Home</a></li>
+            <li class="list-inline-item"><a href="/particle-analysis/">Particle Analysis App</a></li>
+            <li class="list-inline-item"><a href="/map-contributions/">Map Contributions</a></li>
+            <li class="list-inline-item"><a href="{% url 'contact_us' %}">Contact Us</a></li>
+
+        </ul>
+    </div>
+</footer>
+
+{% block extra_js %}
+<script>
+    // Add any additional JavaScript if needed
+</script>
+{% endblock %}

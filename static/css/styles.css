@@ -1,0 +1,82 @@
+/* styles.css */
+
+/* Global font & background color */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Navbar links: black/dark by default */
+.navbar-light .navbar-nav .nav-link {
+    color: #333 !important; 
+}
+.navbar-light .navbar-nav .nav-link:hover {
+    color: #FFA600 !important; 
+}
+.navbar-light .navbar-nav .nav-link.active {
+    color: #FFA600 !important; 
+    font-weight: 500;
+}
+
+/* Hero Section: optional orange background or an image; 
+   For demonstration, let's keep it white or commented out. */
+.hero-section {
+    position: relative;
+    /* background-color: #FFA600;  <-- if you want an orange hero, uncomment this */
+    color: #fff; /* If hero background is orange, text is white */
+    padding: 4rem 0 6rem;
+}
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.hero-section .wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    /* example wave */
+    background: url("data:image/svg+xml;base64,PHN2ZyB...") no-repeat center/cover;
+    transform: translateY(99%);
+}
+
+/* .btn-primary => #FFA600, text => white */
+.btn-primary {
+    background-color: #FFA600 !important;
+    border-color: #FFA600 !important;
+    color: #fff !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #e09100 !important;
+    border-color: #e09100 !important;
+    color: #fff !important;
+}
+
+/* Footer link hover */
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* "Back to Top" button */
+.back-to-top {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    display: none;
+    z-index: 99;
+}
+
+/* Responsiveness */
+@media (max-width: 576px) {
+    footer p, footer a {
+        font-size: 14px;
+    }
+    .hero-section {
+        padding: 3rem 0 5rem;
+    }
+}

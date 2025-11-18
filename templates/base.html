@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}AmiAire-Análisis de polución{% endblock %}</title>
+    <!-- Responsive Meta Tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon (website icon) -->
+    <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
+
+    <!-- Bootstrap CSS (Latest Version, only once!) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Your Custom CSS (styles.css) -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <!-- Additional CSS block -->
+    {% block custom_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar (white background, "navbar-light") -->
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #fff;">
+        <div class="container">
+            <!-- LOGO -->
+            
+                <img src="{% static 'logo.png' %}" alt="AmiAire Logo" height="150" class="me-2">
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+                    style="border: none;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    
+                   
+                    <!-- Equipo -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'particle_analysis' %}active{% endif %}"
+                           href="{% url 'particle_analysis' %}">Herramienta Análisis de polución</a>
+                    </li>
+                    <!-- Kits -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'map_contributions' %}active{% endif %}"
+                           href="{% url 'map_contributions' %}">Mapa de AmiAire</a>
+                    </li>
+
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="hero-content container text-center">
+            <!-- Logo or heading here -->
+            <img src="{% static 'Logo_Second.png' %}" alt="Logo"
+                 class="mb-4" style="height: 300px; width: auto;">
+        </div>
+        <!-- optional wave shape -->
+        <div class="wave" aria-hidden="true"></div>
+    </header>
+
+    <!-- Main Content Block -->
+    <main class="container my-5">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-muted py-4">
+        <div class="container">
+            <p class="mb-2">&copy; 2025 AmiAire. All Rights Reserved.</p>
+            <p class="mb-2">Desarrollado por DeustoTech, University of Deusto, Bilbao, Spain.</p>
+            <ul class="list-inline">
+                <!-- Only the links for 'home', 'particle_analysis' (Equipo), and 'map_contributions' (Kits) remain -->
+                
+            
+                <li class="list-inline-item">
+                    <a href="{% url 'particle_analysis' %}" class="text-decoration-none text-muted">Herramienta Análisis de polución</a>
+                </li>
+                <li class="list-inline-item">
+                    <a href="{% url 'map_contributions' %}" class="text-decoration-none text-muted">Mapa de AmiAire</a>
+                </li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="btn btn-primary back-to-top" role="button"><i class="fas fa-chevron-up"></i></a>
+
+    <!-- Bootstrap JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <!-- Additional JS block -->
+    {% block custom_js %}{% endblock %}
+</body>
+</html>

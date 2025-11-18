@@ -2,8 +2,8 @@
 from pymongo import MongoClient
 import urllib.parse
 
-db_username = 'admin'
-db_password = 'Mohsin.shah123'
+db_username = 'XXXX'
+db_password = 'XXXXX'
 
 # URL encode your username and password
 username = urllib.parse.quote_plus(db_username)
